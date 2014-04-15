@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+{% block body %}
+
+    <div>
+        <h2>Robot Position</h2>
+        <a href=# id="restore">Restore</a> <a href=# id="clear">Clear</a>
+        <br>
+
+        <a href=# id=add>Add Point</a>
+        x:<input type=text size=5 name=x>, y:<input type=text size=5 name=y>
+
+        <div id="my_chart" class="chart">
+        </div>
+    </div>
+
+    <h2>jQuery Example</h2>
+    <p><input type=text size=5 name=a> +
+        <input type=text size=5 name=b> =
+        <span id=result>?</span>
+    <p><a href=# id=calculate>calculate server side</a>
+
+    <!-- flot -->
+    <script src="{{ url_for('static', filename='jquery.flot.min.js') }}">
+    </script>
+    <script src="{{ url_for('static', filename='jquery.flot.resize.min.js') }}">
+    </script>
+    <script src="{{ url_for('static', filename='jquery.flot.navigate.min.js') }}">
+    </script>
+    <!-- uses -->
+    <script src="{{ url_for('static', filename='charts.js') }}">
+    </script>
+    <script>
+        jQuery(document).ready(function () {
+            superTest();
+            $('a#calculate').bind('click', function () {
+                $.getJSON($SCRIPT_ROOT + '/_add_numbers', {
+                    a: $('input[name="a"]').val(),
+                    b: $('input[name="b"]').val()
+                }, function (data) {
+                    $("#result").text(data.result);
+                });
+                return false;
+            });
+            $('a#restore').bind('click', function () {
+                drawPoints();
+                return false;
+            });
+            $('a#clear').bind('click', function () {
+                clear();
+                return false;
+            });
+            $('a#add').bind('click', function () {
+                addPoint($('input[name="x"]').val(), $('input[name="y"]').val());
+                return false;
+            });
+        });
+
+    </script>
+{% endblock %}
