@@ -1,5 +1,5 @@
-import json
 from flask import Flask, jsonify, render_template, request, session, redirect, url_for, flash
+import os
 
 DEBUG = False
 SECRET_KEY = '\x1fx\x9e\xa7\x81Q\xb1\xcdZU~\x14\x0by\xff\xbeW\xf4 \xd0\xcc~\xd6\xc4'
@@ -37,10 +37,35 @@ def execute():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
 
-    the_json = request.json
-    a = 5
+    data = request.json
 
-    return jsonify(the_json=the_json, a=a)
+    file_name_args = 'temp.m'
+
+    points_args = ''
+
+    for i, x in enumerate(data['xArray']):
+        points_args += str(x) + ' ' + str(data['yArray'][i]) + ' ' + str(data['zOrT'][i]) + ' '
+
+    points_args = points_args.strip()
+
+    common_args = file_name_args + ' ' + points_args
+
+    program = ''
+
+    if data['planning'] == 'path':
+        program = 'sudo /home/pi/path/path ' + str(data['T']) + ' ' + str(data['k']) + ' ' + common_args
+    elif data['planning'] == 'points':
+        program = 'sudo /home/pi/points/points ' + common_args
+    else:
+        program = 'sudo /home/pi/reference/reference ' + common_args
+
+    os.system(program)
+
+    file = open('temp.m')
+    string = file.read()
+    file.close()
+
+    return jsonify(program=program, string=string)
 
 
 @app.route('/')

@@ -136,18 +136,6 @@ function initialize() {
 
     $('#execute').click(function () {
 
-
-//         $.post($SCRIPT_ROOT + '/execute', {obj: '{"loka":[1,2,3]}'}, function (data) {
-//         rrr = data;
-//         }, "json")
-//         $.post($SCRIPT_ROOT + '/execute', {obj: '{"T":' + $('input[name="T"]').val() +
-//         ',"planning":' + $('#planning').val() +
-//         ',"k":' + $('input[name="k"]').val() +
-//         ',"points":' + points +
-//         ',"zOrT":' + zOrT +'}'}, function (data) {
-//         rrr = data;
-//         }, "json")
-
         var xArray = [];
         var yArray = [];
 
@@ -155,24 +143,6 @@ function initialize() {
             xArray.push(points[i][0]);
             yArray.push(points[i][1]);
         }
-
-//        $.ajax({
-//            url: $SCRIPT_ROOT + "/execute",
-//            type: "POST",
-//            contentType: "application/json",
-//            processData: false,
-//            data: '{"k": ' + $('input[name="k"]').val() +
-//                ',"T": ' + $('input[name="T"]').val() +
-//                ',"planning": "' + $('#planning').val() + '"' +
-//                ',"zOrT": [' + zOrT + ']' +
-//                ',"xArray": [' + xArray + ']' +
-//                ',"yArray": [' + yArray + ']' +
-//                '}',
-//            dataType: "json",
-//            success: function (data) {
-//                rrr = data;
-//            }
-//        });
 
         $.ajax({
             url: $SCRIPT_ROOT + "/execute",
@@ -188,18 +158,10 @@ function initialize() {
                 '}',
             dataType: "json",
             success: function (data) {
-
+                $('#file').val(data.string);
+                alert('command: ' + data.program);
             }
         });
-
-//        $.post($SCRIPT_ROOT + '/execute', {"k": $('input[name="k"]').val(),
-//            "T": $('input[name="T"]').val(),
-//            "planning": $('#planning').val(),
-//            "points": points,
-//            "zPoints": zOrT
-//        }, function (data) {
-//            alert(data);
-//        }, "json");
     });
 
     $('a#remove').click(function () {
