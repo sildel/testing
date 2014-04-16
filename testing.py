@@ -1,6 +1,7 @@
+import json
 from flask import Flask, jsonify, render_template, request, session, redirect, url_for, flash
 
-DEBUG = True
+DEBUG = False
 SECRET_KEY = '\x1fx\x9e\xa7\x81Q\xb1\xcdZU~\x14\x0by\xff\xbeW\xf4 \xd0\xcc~\xd6\xc4'
 USERNAME = 'silvio'
 PASSWORD = 'silvio.1989'
@@ -29,6 +30,17 @@ def add_numbers_post():
     b = request.form.get('b', 0, type=int)
 
     return jsonify(result=a - b)
+
+
+@app.route('/execute', methods=['POST'])
+def execute():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+
+    the_json = request.json
+    a = 5
+
+    return jsonify(the_json=the_json, a=a)
 
 
 @app.route('/')

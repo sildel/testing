@@ -7,17 +7,29 @@
         <br>
 
         <a href=# id=add>Add Point</a>
-        x:<input type=text size=5 name=x>, y:<input type=text size=5 name=y>
+        x:<input type=text size=5 name=x value="0">, y:<input type=text size=5 name=y value="0">, t (or z):<input
+            type=text size=5 name=t value="5">, k:<input type=text size=5 name=k value="1">, T:<input type=text size=5
+                                                                                                      name=T value="5">
+        <br>
+
+        <a href=# id=execute>Execute track</a>
+        <select id="planning">
+            <option value="reference">Lineal (smooth)</option>
+            <option value="points">Lineal (fixed)</option>
+            <option value="path">Cubic</option>
+        </select>
+
+        <a href=# id=remove>Delete point(s)</a>
+        <select class="select" id="points" multiple="multiple">
+        </select>
+        <br>
+
+        <a href=# id=stop>Stop</a>
+
 
         <div id="my_chart" class="chart">
         </div>
     </div>
-
-    <h2>jQuery Example</h2>
-    <p><input type=text size=5 name=a> +
-        <input type=text size=5 name=b> =
-        <span id=result>?</span>
-    <p><a href=# id=calculate>calculate server side</a>
 
     <!-- flot -->
     <script src="{{ url_for('static', filename='jquery.flot.min.js') }}">
@@ -31,28 +43,7 @@
     </script>
     <script>
         jQuery(document).ready(function () {
-            superTest();
-            $('a#calculate').bind('click', function () {
-                $.getJSON($SCRIPT_ROOT + '/_add_numbers', {
-                    a: $('input[name="a"]').val(),
-                    b: $('input[name="b"]').val()
-                }, function (data) {
-                    $("#result").text(data.result);
-                });
-                return false;
-            });
-            $('a#restore').bind('click', function () {
-                drawPoints();
-                return false;
-            });
-            $('a#clear').bind('click', function () {
-                clear();
-                return false;
-            });
-            $('a#add').bind('click', function () {
-                addPoint($('input[name="x"]').val(), $('input[name="y"]').val());
-                return false;
-            });
+            initialize();
         });
 
     </script>
