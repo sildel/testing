@@ -11,27 +11,6 @@ app.config.from_object(__name__)
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
 
-@app.route('/am-i-the-best')
-def question():
-    return 'Yes, you are!'
-
-
-@app.route('/_add_numbers')
-def add_numbers():
-    """Add two numbers server side, ridiculous but well..."""
-    a = request.args.get('a', 0, type=int)
-    b = request.args.get('b', 0, type=int)
-    return jsonify(result=a + b)
-
-
-@app.route('/my_add', methods=['POST'])
-def add_numbers_post():
-    a = request.form.get('a', 0, type=int)
-    b = request.form.get('b', 0, type=int)
-
-    return jsonify(result=a - b)
-
-
 @app.route('/execute', methods=['POST'])
 def execute():
     if not session.get('logged_in'):
@@ -43,8 +22,8 @@ def execute():
 
     points_args = ''
 
-    for i, x in enumerate(data['xArray']):
-        points_args += str(x) + ' ' + str(data['yArray'][i]) + ' ' + str(data['zOrT'][i]) + ' '
+    for i, point in enumerate(data['points']):
+        points_args += str(point[0]) + ' ' + str(point[1]) + ' ' + str(data['zOrT'][i]) + ' '
 
     points_args = points_args.strip()
 
@@ -59,13 +38,14 @@ def execute():
     else:
         program = 'sudo /home/pi/reference/reference ' + common_args
 
-    os.system(program)
+    #os.system(program)
 
-    file = open('temp.m')
-    string = file.read()
-    file.close()
+    #file = open('temp.m')
+    #string = file.read()
+    #file.close()
 
-    return jsonify(program=program, string=string)
+    #return jsonify(program=program, string=string)
+    return jsonify(program=program, string="need")
 
 
 @app.route('/')

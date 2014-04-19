@@ -136,26 +136,19 @@ function initialize() {
 
     $('#execute').click(function () {
 
-        var xArray = [];
-        var yArray = [];
-
-        for (var i = 0; i < points.length; i++) {
-            xArray.push(points[i][0]);
-            yArray.push(points[i][1]);
-        }
+        var data_post = {"k": $('input[name="k"]').val(),
+            "T": $('input[name = "T"]').val(),
+            "planning": $('#planning').val(),
+            "zOrT": zOrT,
+            "points": points
+        };
 
         $.ajax({
             url: $SCRIPT_ROOT + "/execute",
             type: "POST",
             contentType: "application/json",
             processData: false,
-            data: '{"k": ' + $('input[name="k"]').val() +
-                ',"T": ' + $('input[name="T"]').val() +
-                ',"planning": "' + $('#planning').val() + '"' +
-                ',"zOrT": [' + zOrT + ']' +
-                ',"xArray": [' + xArray + ']' +
-                ',"yArray": [' + yArray + ']' +
-                '}',
+            data: JSON.stringify(data_post),
             dataType: "json",
             success: function (data) {
                 $('#file').val(data.string);
