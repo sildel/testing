@@ -3,28 +3,31 @@
 
     <div>
         <h2>Robot Position</h2>
+
+
+        <h2>Experiments</h2>
         <a href=# id="restore">Restore</a> <a href=# id="clear">Clear</a>
         <br>
 
-        <a href=# id=add>Add Point</a>
+        <a id=add>Add Point</a>
         x:<input type=text size=5 name=x value="0">, y:<input type=text size=5 name=y value="0">, t (or z):<input
             type=text size=5 name=t value="5">, k:<input type=text size=5 name=k value="1">, T:<input type=text size=5
                                                                                                       name=T value="5">
         <br>
 
-        <a href=# id=execute>Execute track</a>
+        <a id=execute>Execute track</a>
         <select id="planning">
             <option value="reference">Lineal (smooth)</option>
             <option value="points">Lineal (fixed)</option>
             <option value="path">Cubic</option>
         </select>
 
-        <a href=# id=remove>Delete point(s)</a>
+        <a id=remove>Delete point(s)</a>
         <select class="select" id="points" multiple="multiple">
         </select>
         <br>
 
-        <a href=# id=stop>Stop</a>
+        <a id=stop>Stop</a>
         <br>
 
         Position Graph

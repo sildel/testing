@@ -55,6 +55,11 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/boo')
+def boo():
+    return render_template('base.html')
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
