@@ -1,54 +1,108 @@
 {% extends "layout.html" %}
 {% block body %}
+    <h1>Robot Position</h1>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas sed diam eget risus varius blandit sit amet non
+        magna. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent commodo cursus magna, vel scelerisque
+        nisl consectetur et. Cras mattis consectetur purus sit amet fermentum. Duis mollis, est non commodo luctus, nisi
+        erat porttitor ligula, eget lacinia odio sem nec elit. Aenean lacinia bibendum nulla sed consectetur.</p>
 
-    <div>
-        <h2>Robot Position</h2>
+    <h1>Experiments</h1>
 
-
-        <h2>Experiments</h2>
-        <a href=# id="restore">Restore</a> <a href=# id="clear">Clear</a>
-        <br>
-
-        <a id=add>Add Point</a>
-        x:<input type=text size=5 name=x value="0">, y:<input type=text size=5 name=y value="0">, t (or z):<input
-            type=text size=5 name=t value="5">, k:<input type=text size=5 name=k value="1">, T:<input type=text size=5
-                                                                                                      name=T value="5">
-        <br>
-
-        <a id=execute>Execute track</a>
-        <select id="planning">
-            <option value="reference">Lineal (smooth)</option>
-            <option value="points">Lineal (fixed)</option>
-            <option value="path">Cubic</option>
-        </select>
-
-        <a id=remove>Delete point(s)</a>
-        <select class="select" id="points" multiple="multiple">
-        </select>
-        <br>
-
-        <a id=stop>Stop</a>
-        <br>
-
-        Position Graph
-        <div id="my_chart" class="chart">
+    <div class="row">
+        <div id="my_chart" class="col-md-10">
         </div>
-        <br>
-
-        File for MatLab
-        <br>
-        <textarea class="code" id="file"></textarea>
+        <button class="btn btn-primary btn-lg" type="button" id="buttonRestore">Restore</button>
+        <button class="btn btn-primary btn-lg" type="button" id="buttonClear">Clear</button>
     </div>
 
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="inputX">X</label>
+                <input type="text" class="form-control" name="inputX" placeholder="Enter X Coordinate">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="inputY">Y</label>
+                <input type="text" class="form-control" name="inputY" placeholder="Enter Y Coordinate">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="inputTorZ">T or Z</label>
+                <input type="text" class="form-control" name="inputTorZ" placeholder="Enter T or Z">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-success btn-lg" type="button" id="buttonAdd">
+                <div class="glyphicon glyphicon-plus"></div>
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="inputK">K</label>
+                <input type="text" class="form-control" name="inputK" placeholder="Enter Constant K">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="inputT">T</label>
+                <input type="text" class="form-control" name="inputT" placeholder="Enter Constant T">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="selectMethod">Method</label>
+                <select class="form-control" id="selectMethod">
+                </select>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-success btn-lg" type="button" id="buttonPlay">
+                <div class="glyphicon glyphicon-play"></div>
+            </button>
+            <button class="btn btn-warning btn-lg" type="button" id="buttonStop">
+                <div class="glyphicon glyphicon-stop"></div>
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="selectPoints">Points</label>
+                <select class="form-control" multiple="" id="selectPoints">
+                </select>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-danger btn-lg" type="button" id="buttonRemove">
+                <div class="glyphicon glyphicon-remove"></div>
+            </button>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="textAreaFileM">Matlab File</label>
+        <textarea id="textAreaFileM" class="form-control" rows="3"></textarea>
+    </div>
+
+{% endblock %}
+
+{% block javas %}
+    {{ super() }}
     <!-- flot -->
-    <script src="{{ url_for('static', filename='jquery.flot.min.js') }}">
+    <script src="{{ url_for('static', filename='js/jquery.flot.min.js') }}">
     </script>
-    <script src="{{ url_for('static', filename='jquery.flot.resize.min.js') }}">
+    <script src="{{ url_for('static', filename='js/jquery.flot.resize.min.js') }}">
     </script>
-    <script src="{{ url_for('static', filename='jquery.flot.navigate.min.js') }}">
+    <script src="{{ url_for('static', filename='js/jquery.flot.navigate.min.js') }}">
     </script>
+
     <!-- uses -->
-    <script src="{{ url_for('static', filename='charts.js') }}">
+    <script src="{{ url_for('static', filename='js/charts.js') }}">
     </script>
     <script>
         jQuery(document).ready(function () {
@@ -57,3 +111,8 @@
 
     </script>
 {% endblock %}
+{#TODO: Add tooltips#}
+{#TODO: validation styles#}
+{#TODO: Let multi-select auto resize#}
+{#TODO: accordion or hide/show for sections#}
+{#TODO: improve ui components placement#}

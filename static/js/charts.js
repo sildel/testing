@@ -50,15 +50,15 @@ function callPlot(data) {
 
 function drawPoints() {
 
-    if ($("#planning").children(':selected').val() == 'points' || $("#planning").children(':selected').val() == 'reference') {
+    if ($("#selectMethod").children(':selected').val() == "Lineal Smooth" || $("#selectMethod").children(':selected').val() == 'Lineal Fixed') {
         callPlot(points);
     }
     else {
 
         cubicPoints = [];
 
-        var T_planning = $('input[name="T"]').val();
-        var K_planning = $('input[name="k"]').val();
+        var T_planning = $('input[name="inputT"]').val();
+        var K_planning = $('input[name="inputK"]').val();
 
         var planning_points = points.length;
 
@@ -111,33 +111,36 @@ function drawPoints() {
 }
 
 function initialize() {
-
+    initFields();
     drawPoints();
-    refreshSelect();
+    initEvents();
+}
 
-    $('a#calculate').click(function () {
-        $.getJSON($SCRIPT_ROOT + '/_add_numbers', {
-            a: $('input[name="a"]').val(),
-            b: $('input[name="b"]').val()
-        }, function (data) {
-            $("#result").text(data.result);
-        });
-    });
-    $('a#restore').click(function () {
+function initEvents() {
+    $('#buttonRestore').click(function () {
         drawPoints();
     });
-    $('a#clear').click(function () {
-        clear();
-    });
-    $('a#add').click(function () {
-        addPoint($('input[name="x"]').val(), $('input[name="y"]').val()
-            , $('input[name="t"]').val());
+
+    $('#buttonClear').click(function () {
+        points = [];
+
+        zOrT = [];
+
+        cubicPoints = [];
+
+        refreshSelect();
+
+        drawPoints();
     });
 
-    $('#execute').click(function () {
+    $('#buttonAdd').click(function () {
+        addPoint($('input[name="inputX"]').val(), $('input[name="inputY"]').val()
+            , $('input[name="inputTorZ"]').val());
+    });
 
-        var data_post = {"k": $('input[name="k"]').val(),
-            "T": $('input[name = "T"]').val(),
+    $('#buttonPlay').click(function () {
+        var data_post = {"k": $('input[name="inputK"]').val(),
+            "T": $('input[name = "inputT"]').val(),
             "planning": $('#planning').val(),
             "zOrT": zOrT,
             "points": points
@@ -157,9 +160,9 @@ function initialize() {
         });
     });
 
-    $('a#remove').click(function () {
+    $('#buttonRemove').click(function () {
         var indexes = [];
-        $("#points").children().filter(':selected').each(function () {
+        $("#selectPoints").children().filter(':selected').each(function () {
             indexes.push(this.value);
         });
         var newPoints = [];
@@ -180,7 +183,7 @@ function initialize() {
         drawPoints();
     });
 
-    $('#planning').change(function () {
+    $('#selectMethod').change(function () {
         drawPoints();
     });
 
@@ -190,7 +193,6 @@ function initialize() {
             this.value = 1;
         }
     });
-
 }
 
 function has(array, value) {
@@ -215,26 +217,34 @@ function addPoint(x, y, t) {
     drawPoints();
 }
 
-function clear() {
+function initFields() {
 
-    points = [];
+    var chart = $('#my_chart');
+    chart.css('height', (Number(chart.css('width').split('p')[0]) / 1.8).toFixed() + 'px');
 
-    zOrT = [];
+    $('input[name="inputK"]').val(1)
+    $('input[name="inputT"]').val(5);
+    $('input[name="inputX"]').val(0);
+    $('input[name="inputY"]').val(0);
+    $('input[name="inputTorZ"]').val(5);
 
-    cubicPoints = [];
+    var selectMethod = $('#selectMethod');
+    selectMethod.children().remove();
+    selectMethod.append(new Option('Lineal Smooth'));
+    selectMethod.append(new Option('Lineal Fixed'));
+    selectMethod.append(new Option('Cubic'));
 
     refreshSelect();
-
-    drawPoints();
 }
 
 function refreshSelect() {
 
-    var select = $('#points');
+    var selectPoints = $('#selectPoints');
 
-    select.children().remove();
+    selectPoints.children().remove();
 
     for (var i = 0; i < points.length; i++) {
-        select.append(new Option(points[i].toString() + ',' + zOrT[i].toString(), i));
+        selectPoints.append(new Option(points[i].toString() + ',' + zOrT[i].toString(), i));
     }
 }
+//TODO: pop up in chart and multi select
