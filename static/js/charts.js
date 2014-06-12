@@ -9,7 +9,151 @@ var points = [
 
 var cubicPoints = [];
 
+var positionPointsXY = [];
+var positionPointsZ = [];
+
 var zOrT = [0, 5, 5, 5, 5, 5];
+
+function updatePosition() {
+    $.getJSON('/position', function (data) {
+        var str = 'x: ' + data.position.x + ', y: ' + data.position.y + ', z: ' + data.position.z;
+        positionPointsXY.push([data.position.x, data.position.y]);
+        positionPointsZ.push(data.position.z);
+
+        $.plot($("#positionChart"), [
+            {
+                color: 3,
+                label: "Position",
+                data: positionPointsXY
+            }
+        ], {
+            series: {
+                lines: {
+                    show: true
+                },
+                points: {
+                    show: true,
+                    radius: 3
+                },
+                shadowSize: 0
+
+            },
+            grid: {
+                hoverable: true,
+                clickable: false
+            },
+            xaxis: {
+                zoomRange: [0.1, 10],
+                panRange: [-10, 10]
+            },
+            yaxis: {
+                zoomRange: [0.1, 10],
+                panRange: [-10, 10]
+            },
+            zoom: {
+                interactive: true
+            },
+            pan: {
+                interactive: true
+            }
+        });
+
+        $("#buttonPosition").text(str);
+    });
+
+    setTimeout(updatePosition, 1000);
+}
+
+function validateInput() {
+
+    var input = $('input[name="inputX"]');
+    if (isNaN(input.val())) {
+        input.parent().addClass('has-error');
+    }
+    else {
+        input.parent().removeClass('has-error');
+    }
+
+    input = $('input[name="inputY"]');
+    if (isNaN(input.val())) {
+        input.parent().addClass('has-error');
+    }
+    else {
+        input.parent().removeClass('has-error');
+    }
+
+    input = $('input[name="inputTorZ"]');
+    if ($("#selectMethod").val() == "Lineal Smooth" || $("#selectMethod").val() == "Lineal Fixed") {
+        if (isNaN(input.val()) || input.val() <= 0) {
+            input.parent().addClass('has-error');
+        }
+        else {
+            input.parent().removeClass('has-error');
+        }
+    }
+    else {
+        if (isNaN(input.val())) {
+            input.parent().addClass('has-error');
+        }
+        else {
+            input.parent().removeClass('has-error');
+        }
+    }
+
+    input = $('input[name="inputK"]');
+    if (isNaN(input.val()) || input.val() <= 0) {
+        input.parent().addClass('has-error');
+    }
+    else {
+        input.parent().removeClass('has-error');
+    }
+
+    input = $('input[name="inputT"]');
+    if (isNaN(input.val()) || input.val() <= 0) {
+        input.parent().addClass('has-error');
+    }
+    else {
+        input.parent().removeClass('has-error');
+    }
+}
+
+function validateButtonPlay() {
+    var input = $('input[name="inputK"]');
+    if (isNaN(input.val()) || input.val() <= 0) {
+        return false;
+    }
+
+    input = $('input[name="inputT"]');
+    if (isNaN(input.val()) || input.val() <= 0) {
+        return false;
+    }
+    return true;
+}
+
+function validateButtonAdd() {
+    var input = $('input[name="inputX"]');
+    if (isNaN(input.val())) {
+        return false;
+    }
+
+    input = $('input[name="inputY"]');
+    if (isNaN(input.val())) {
+        return false;
+    }
+
+    input = $('input[name="inputTorZ"]');
+    if ($("#selectMethod").val() == "Lineal Smooth" || $("#selectMethod").val() == "Lineal Fixed") {
+        if (isNaN(input.val()) || input.val() <= 0) {
+            return false;
+        }
+    }
+    else {
+        if (isNaN(input.val())) {
+            return false;
+        }
+    }
+    return true;
+}
 
 function callPlot(data) {
 
@@ -31,6 +175,10 @@ function callPlot(data) {
             shadowSize: 0
 
         },
+        grid: {
+            hoverable: true,
+            clickable: false
+        },
         xaxis: {
             zoomRange: [0.1, 10],
             panRange: [-10, 10]
@@ -50,7 +198,7 @@ function callPlot(data) {
 
 function drawPoints() {
 
-    if ($("#selectMethod").children(':selected').val() == "Lineal Smooth" || $("#selectMethod").children(':selected').val() == 'Lineal Fixed') {
+    if ($("#selectMethod").val() == "Lineal Smooth" || $("#selectMethod").val() == 'Lineal Fixed') {
         callPlot(points);
     }
     else {
@@ -134,29 +282,86 @@ function initEvents() {
     });
 
     $('#buttonAdd').click(function () {
+        if (validateButtonAdd() == false) {
+            alert("Can't add the point because you specified invalid data.");
+            return;
+        }
         addPoint($('input[name="inputX"]').val(), $('input[name="inputY"]').val()
             , $('input[name="inputTorZ"]').val());
     });
 
     $('#buttonPlay').click(function () {
+        if (validateButtonPlay() == false) {
+            alert("Can't execute the experiment because you specified invalid data.");
+            return;
+        }
+
         var data_post = {"k": $('input[name="inputK"]').val(),
             "T": $('input[name = "inputT"]').val(),
-            "planning": $('#planning').val(),
+            "planning": $("#selectMethod").val(),
             "zOrT": zOrT,
             "points": points
         };
 
         $.ajax({
-            url: $SCRIPT_ROOT + "/execute",
+            url: "/execute",
             type: "POST",
             contentType: "application/json",
             processData: false,
             data: JSON.stringify(data_post),
             dataType: "json",
             success: function (data) {
-                $('#file').val(data.string);
+//                $('#file').val(data.string);
                 alert('command: ' + data.program);
             }
+        });
+    });
+
+    $('#buttonPosition').click(function () {
+        $.getJSON('/position', function (data) {
+            var str = 'x: ' + data.position.x + ', y: ' + data.position.y + ', z: ' + data.position.z;
+            positionPointsXY.push([data.position.x, data.position.y]);
+            positionPointsZ.push(data.position.z);
+
+            $.plot($("#positionChart"), [
+                {
+                    color: 3,
+                    label: "Position",
+                    data: positionPointsXY
+                }
+            ], {
+                series: {
+                    lines: {
+                        show: true
+                    },
+                    points: {
+                        show: true,
+                        radius: 3
+                    },
+                    shadowSize: 0
+
+                },
+                grid: {
+                    hoverable: true,
+                    clickable: false
+                },
+                xaxis: {
+                    zoomRange: [0.1, 10],
+                    panRange: [-10, 10]
+                },
+                yaxis: {
+                    zoomRange: [0.1, 10],
+                    panRange: [-10, 10]
+                },
+                zoom: {
+                    interactive: true
+                },
+                pan: {
+                    interactive: true
+                }
+            });
+
+            $("#buttonPosition").text(str);
         });
     });
 
@@ -184,15 +389,21 @@ function initEvents() {
     });
 
     $('#selectMethod').change(function () {
+        validateInput();
         drawPoints();
+        refreshMethod();
     });
 
-    $('input[type="text"]').change(function () {
-        if (isNaN($(this).val())) {
-            alert('The data entered is invalid');
-            this.value = 1;
-        }
+    $('input[type="text"]').keyup(function () {
+        validateInput();
     });
+
+    $('#my_chart').bind('plothover', function (event, pos, item) {
+        $('input[name="inputX"]').val(pos.x.toFixed(2));
+        $('input[name="inputY"]').val(pos.y.toFixed(2));
+    });
+
+    setTimeout(updatePosition, 1000);
 }
 
 function has(array, value) {
@@ -221,6 +432,8 @@ function initFields() {
 
     var chart = $('#my_chart');
     chart.css('height', (Number(chart.css('width').split('p')[0]) / 1.8).toFixed() + 'px');
+    chart = $('#positionChart');
+    chart.css('height', (Number(chart.css('width').split('p')[0]) / 1.8).toFixed() + 'px');
 
     $('input[name="inputK"]').val(1)
     $('input[name="inputT"]').val(5);
@@ -235,6 +448,26 @@ function initFields() {
     selectMethod.append(new Option('Cubic'));
 
     refreshSelect();
+
+    refreshMethod();
+}
+
+function refreshMethod() {
+    if ($("#selectMethod").val() == "Lineal Smooth" || $("#selectMethod").val() == "Lineal Fixed") {
+        $('#labelTorZ').text('T');
+        var input = $('input[name="inputK"]');
+        input.parent().hide();
+        input = $('input[name="inputT"]');
+        input.parent().hide();
+    }
+    else {
+        $('#labelTorZ').text('Z');
+        var input = $('input[name="inputK"]');
+        input.parent().show();
+
+        input = $('input[name="inputT"]');
+        input.parent().show();
+    }
 }
 
 function refreshSelect() {
@@ -248,3 +481,10 @@ function refreshSelect() {
     }
 }
 //TODO: pop up in chart and multi select
+//TODO: Look for validation plugin or library
+//TODO: Add periodic auto request
+//TODO: Add mini log about request
+//TODO: Add button for restore and reset
+//TODO: Add plot with orientation
+//TODO: Add simple commands for movements
+//TODO: Add getting image
