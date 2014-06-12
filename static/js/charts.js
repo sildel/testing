@@ -9,62 +9,81 @@ var points = [
 
 var cubicPoints = [];
 
+var zOrT = [0, 5, 5, 5, 5, 5];
+
 var positionPointsXY = [];
 var positionPointsZ = [];
+var goToX = 0;
+var goToY = 0;
 
-var zOrT = [0, 5, 5, 5, 5, 5];
+function callPositionPlot() {
+    $.plot($("#positionChart"), [
+        {
+            color: 3,
+            label: "Position",
+            data: positionPointsXY
+        }
+    ], {
+        series: {
+            lines: {
+                show: true
+            },
+            points: {
+                show: true,
+                radius: 3
+            },
+            shadowSize: 0
+
+        },
+        grid: {
+            hoverable: true,
+            clickable: true
+        },
+        xaxis: {
+            zoomRange: [0.1, 10],
+            panRange: [-10, 10]
+        },
+        yaxis: {
+            zoomRange: [0.1, 10],
+            panRange: [-10, 10]
+        },
+        zoom: {
+            interactive: true
+        },
+        pan: {
+            interactive: true
+        }
+    });
+}
 
 function updatePosition() {
     $.getJSON('/position', function (data) {
         var str = 'x: ' + data.position.x + ', y: ' + data.position.y + ', z: ' + data.position.z;
-        positionPointsXY.push([data.position.x, data.position.y]);
-        positionPointsZ.push(data.position.z);
 
-        $.plot($("#positionChart"), [
-            {
-                color: 3,
-                label: "Position",
-                data: positionPointsXY
-            }
-        ], {
-            series: {
-                lines: {
-                    show: true
-                },
-                points: {
-                    show: true,
-                    radius: 3
-                },
-                shadowSize: 0
+        if (positionPointsXY.length == 0 || data.position.x != positionPointsXY[positionPointsXY.length - 1][0] &&
+            data.position.y != positionPointsXY[positionPointsXY.length - 1][1] &&
+            data.position.z != positionPointsZ[positionPointsZ.length - 1]) {
 
-            },
-            grid: {
-                hoverable: true,
-                clickable: false
-            },
-            xaxis: {
-                zoomRange: [0.1, 10],
-                panRange: [-10, 10]
-            },
-            yaxis: {
-                zoomRange: [0.1, 10],
-                panRange: [-10, 10]
-            },
-            zoom: {
-                interactive: true
-            },
-            pan: {
-                interactive: true
-            }
-        });
+            positionPointsXY.push([data.position.x, data.position.y]);
+            positionPointsZ.push(data.position.z);
 
-        $("#buttonPosition").text(str);
+            callPositionPlot();
+
+            $("#buttonPosition").text(str);
+        }
     });
 
     setTimeout(updatePosition, 1000);
 }
 
 function validateInput() {
+    var input = $('input[name="inputGoToT"]');
+    if (isNaN(input.val())) {
+        input.parent().addClass('has-error');
+    }
+    else {
+        input.parent().removeClass('has-error');
+    }
 
     var input = $('input[name="inputX"]');
     if (isNaN(input.val())) {
@@ -323,43 +342,7 @@ function initEvents() {
             positionPointsXY.push([data.position.x, data.position.y]);
             positionPointsZ.push(data.position.z);
 
-            $.plot($("#positionChart"), [
-                {
-                    color: 3,
-                    label: "Position",
-                    data: positionPointsXY
-                }
-            ], {
-                series: {
-                    lines: {
-                        show: true
-                    },
-                    points: {
-                        show: true,
-                        radius: 3
-                    },
-                    shadowSize: 0
-
-                },
-                grid: {
-                    hoverable: true,
-                    clickable: false
-                },
-                xaxis: {
-                    zoomRange: [0.1, 10],
-                    panRange: [-10, 10]
-                },
-                yaxis: {
-                    zoomRange: [0.1, 10],
-                    panRange: [-10, 10]
-                },
-                zoom: {
-                    interactive: true
-                },
-                pan: {
-                    interactive: true
-                }
-            });
+            callPositionPlot();
 
             $("#buttonPosition").text(str);
         });
@@ -403,7 +386,87 @@ function initEvents() {
         $('input[name="inputY"]').val(pos.y.toFixed(2));
     });
 
+    $('#positionChart').bind('plotclick', function (event, pos, item) {
+        goToX = pos.x.toFixed(2);
+        goToY = pos.y.toFixed(2);
+        updateGoTo();
+    });
+
+    $('#buttonPositionRestore').click(function () {
+        callPositionPlot();
+    });
+
+    $('#buttonPositionReset').click(function () {
+        $.ajax({
+            url: "/reset",
+            type: "POST",
+            contentType: "application/json",
+            processData: false,
+            data: "",
+            dataType: "json",
+            success: function (data) {
+//                $('#file').val(data.string);
+                positionPointsXY = []
+                positionPointsZ = []
+
+                alert('command: ' + data.program);
+            }
+        });
+    });
+
+    $('#buttonGoTo').click(function () {
+        if (validateButtonGoTo() == false) {
+            alert("Can't execute the movement because you specified invalid data.");
+            return;
+        }
+
+        var data_post = {
+            "X": goToX,
+            "Y": goToY,
+            "T": $('input[name="inputGoToT"]').val()
+        };
+
+        $.ajax({
+            url: "/move",
+            type: "POST",
+            contentType: "application/json",
+            processData: false,
+            data: JSON.stringify(data_post),
+            dataType: "json",
+            success: function (data) {
+//                $('#file').val(data.string);
+                alert('command: ' + data.program);
+            }
+        });
+    });
+
+    $('#buttonStop').click(function () {
+        $.ajax({
+            url: "/stop",
+            type: "POST",
+            contentType: "application/json",
+            processData: false,
+            data: "",
+            dataType: "json",
+            success: function (data) {
+                alert('command: ' + data.program);
+            }
+        });
+    });
+
     setTimeout(updatePosition, 1000);
+}
+
+function validateButtonGoTo() {
+    var input = $('input[name="inputGoToT"]');
+    if (isNaN(input.val()) || input.val() <= 0) {
+        return false;
+    }
+    return true;
+}
+
+function updateGoTo() {
+    $('#buttonGoTo').text('Go To: ' + goToX + ', ' + goToY);
 }
 
 function has(array, value) {
@@ -440,6 +503,9 @@ function initFields() {
     $('input[name="inputX"]').val(0);
     $('input[name="inputY"]').val(0);
     $('input[name="inputTorZ"]').val(5);
+
+    $('input[name="inputGoToT"]').val(5);
+    updateGoTo();
 
     var selectMethod = $('#selectMethod');
     selectMethod.children().remove();
@@ -484,7 +550,7 @@ function refreshSelect() {
 //TODO: Look for validation plugin or library
 //TODO: Add periodic auto request
 //TODO: Add mini log about request
-//TODO: Add button for restore and reset
 //TODO: Add plot with orientation
 //TODO: Add simple commands for movements
+//TODO: Add movement to click
 //TODO: Add getting image

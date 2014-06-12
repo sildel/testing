@@ -67,6 +67,41 @@ def execute():
     return jsonify(program=program)
 
 
+@app.route('/move', methods=['POST'])
+def move():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+
+    data = request.json
+
+    program = 'position ' + str(data['X']) + ',' + str(data['Y']) + ',' + str(data['T'])
+
+    s.sendall(program)
+
+    return jsonify(program=program)
+
+
+@app.route('/reset', methods=['POST'])
+def reset():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    program = 'position reset'
+
+    s.sendall(program)
+
+    return jsonify(program=program)
+
+@app.route('/stop', methods=['POST'])
+def stop():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    program = 'experiment stop'
+
+    s.sendall(program)
+
+    return jsonify(program=program)
+
+
 @app.route('/position', methods=['GET'])
 def get_position():
     global position_flag
