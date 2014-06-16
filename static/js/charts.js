@@ -26,11 +26,39 @@ function callPositionPlot() {
     ], {
         series: {
             lines: {
-                show: true
+                show: false
             },
             points: {
                 show: true,
-                radius: 3
+                radius: 7,
+                symbol: function robot(ctx, x, y, radius, shadow, i) {
+
+                    var z = -positionPointsZ[i];
+
+                    if (i == positionPointsZ.length - 1) {
+                        ctx.lineWidth = 5;
+                    }
+
+                    var x1 = x + radius * Math.cos(z);
+                    var y1 = y + radius * Math.sin(z);
+
+                    //var x2 = x - 0.5 * radius * Math.cos(z);
+                    //var y2 = y - 0.5 * radius * Math.sin(z);
+
+                    var x2 = x;
+                    var y2 = y;
+
+                    var x3 = x + radius * Math.cos(z + 2 * Math.PI / 3);
+                    var y3 = y + radius * Math.sin(z + 2 * Math.PI / 3);
+
+                    var x4 = x + radius * Math.cos(z - 2 * Math.PI / 3);
+                    var y4 = y + radius * Math.sin(z - 2 * Math.PI / 3);
+
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x3, y3);
+                    ctx.lineTo(x2, y2);
+                    ctx.lineTo(x4, y4);
+                }
             },
             shadowSize: 0
 
@@ -73,7 +101,7 @@ function updatePosition() {
         }
     });
 
-    setTimeout(updatePosition, 1000);
+    setTimeout(updatePosition, 250);
 }
 
 function validateInput() {
@@ -178,7 +206,7 @@ function callPlot(data) {
 
     $.plot($("#my_chart"), [
         {
-            color: 3,
+            color: 2,
             label: "Reference",
             data: data
         }
@@ -454,7 +482,7 @@ function initEvents() {
         });
     });
 
-    setTimeout(updatePosition, 1000);
+    setTimeout(updatePosition, 250);
 }
 
 function validateButtonGoTo() {
@@ -546,11 +574,9 @@ function refreshSelect() {
         selectPoints.append(new Option(points[i].toString() + ',' + zOrT[i].toString(), i));
     }
 }
-//TODO: pop up in chart and multi select
+//TODO: context menu in chart and multi select
 //TODO: Look for validation plugin or library
-//TODO: Add periodic auto request
 //TODO: Add mini log about request
-//TODO: Add plot with orientation
 //TODO: Add simple commands for movements
-//TODO: Add movement to click
 //TODO: Add getting image
+//TODO: Add units in axes and change legend

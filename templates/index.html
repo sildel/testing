@@ -104,7 +104,7 @@
 {% block javas %}
     {{ super() }}
     <!-- flot -->
-    <script src="{{ url_for('static', filename='js/jquery.flot.min.js') }}">
+    <script src="{{ url_for('static', filename='js/jquery.flot.js') }}">
     </script>
     <script src="{{ url_for('static', filename='js/jquery.flot.resize.min.js') }}">
     </script>
@@ -121,8 +121,8 @@
 
     </script>
 {% endblock %}
-{#TODO: Add tooltips#}
+{#TODO: Add tooltips or help#}
 {#TODO: Let multi-select auto resize#}
 {#TODO: accordion or hide/show for sections#}
 {#TODO: improve ui components placement#}
-{#TODO: resize my_chart on event#}
+{#TODO: resize charts on event#}
