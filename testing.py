@@ -91,6 +91,7 @@ def reset():
 
     return jsonify(program=program)
 
+
 @app.route('/stop', methods=['POST'])
 def stop():
     if not session.get('logged_in'):
@@ -136,12 +137,6 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/boo')
-def boo():
-    s.sendall('position ask')
-    return render_template('base.html')
-
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
@@ -167,6 +162,6 @@ def logout():
 if __name__ == '__main__':
     HOST = '10.0.0.15'
     PORT = 50007
-    #s.connect((HOST, PORT))
-    #thread.start_new_thread(read_thread, ())
+    s.connect((HOST, PORT))
+    thread.start_new_thread(read_thread, ())
     app.run(host='0.0.0.0')

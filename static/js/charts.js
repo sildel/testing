@@ -13,13 +13,11 @@ var zOrT = [0, 5, 5, 5, 5, 5];
 
 var positionPointsXY = [];
 var positionPointsZ = [];
-var goToX = 0;
-var goToY = 0;
 
 function callPositionPlot() {
     $.plot($("#positionChart"), [
         {
-            color: 3,
+            color: 2,
             label: "Position",
             data: positionPointsXY
         }
@@ -86,8 +84,6 @@ function callPositionPlot() {
 
 function updatePosition() {
     $.getJSON('/position', function (data) {
-        var str = 'x: ' + data.position.x + ', y: ' + data.position.y + ', z: ' + data.position.z;
-
         if (positionPointsXY.length == 0 || data.position.x != positionPointsXY[positionPointsXY.length - 1][0] &&
             data.position.y != positionPointsXY[positionPointsXY.length - 1][1] &&
             data.position.z != positionPointsZ[positionPointsZ.length - 1]) {
@@ -96,8 +92,6 @@ function updatePosition() {
             positionPointsZ.push(data.position.z);
 
             callPositionPlot();
-
-            $("#buttonPosition").text(str);
         }
     });
 
@@ -106,6 +100,14 @@ function updatePosition() {
 
 function validateInput() {
     var input = $('input[name="inputGoToT"]');
+    if (isNaN(input.val()) || input.val() <= 0) {
+        input.parent().addClass('has-error');
+    }
+    else {
+        input.parent().removeClass('has-error');
+    }
+
+    input = $('input[name="inputGoToX"]');
     if (isNaN(input.val())) {
         input.parent().addClass('has-error');
     }
@@ -113,7 +115,15 @@ function validateInput() {
         input.parent().removeClass('has-error');
     }
 
-    var input = $('input[name="inputX"]');
+    input = $('input[name="inputGoToY"]');
+    if (isNaN(input.val())) {
+        input.parent().addClass('has-error');
+    }
+    else {
+        input.parent().removeClass('has-error');
+    }
+
+    input = $('input[name="inputX"]');
     if (isNaN(input.val())) {
         input.parent().addClass('has-error');
     }
@@ -165,6 +175,7 @@ function validateInput() {
 }
 
 function validateButtonPlay() {
+    validateInput();
     var input = $('input[name="inputK"]');
     if (isNaN(input.val()) || input.val() <= 0) {
         return false;
@@ -178,6 +189,7 @@ function validateButtonPlay() {
 }
 
 function validateButtonAdd() {
+    validateInput();
     var input = $('input[name="inputX"]');
     if (isNaN(input.val())) {
         return false;
@@ -206,7 +218,7 @@ function callPlot(data) {
 
     $.plot($("#my_chart"), [
         {
-            color: 2,
+            color: 3,
             label: "Reference",
             data: data
         }
@@ -366,13 +378,9 @@ function initEvents() {
 
     $('#buttonPosition').click(function () {
         $.getJSON('/position', function (data) {
-            var str = 'x: ' + data.position.x + ', y: ' + data.position.y + ', z: ' + data.position.z;
             positionPointsXY.push([data.position.x, data.position.y]);
             positionPointsZ.push(data.position.z);
-
             callPositionPlot();
-
-            $("#buttonPosition").text(str);
         });
     });
 
@@ -405,6 +413,10 @@ function initEvents() {
         refreshMethod();
     });
 
+    $('input[type="text"]').change(function () {
+        validateInput();
+    });
+
     $('input[type="text"]').keyup(function () {
         validateInput();
     });
@@ -426,12 +438,13 @@ function initEvents() {
             }
 
         }
+        validateInput();
     });
 
     $('#positionChart').bind('plothover', function (event, pos, item) {
-        goToX = pos.x.toFixed(2);
-        goToY = pos.y.toFixed(2);
-        updateGoTo();
+        $('input[name="inputGoToX"]').val(pos.x.toFixed(2));
+        $('input[name="inputGoToY"]').val(pos.y.toFixed(2));
+        validateInput();
     });
 
     $('#buttonPositionRestore').click(function () {
@@ -463,8 +476,8 @@ function initEvents() {
         }
 
         var data_post = {
-            "X": goToX,
-            "Y": goToY,
+            "X": $('input[name="inputGoToX"]').val(),
+            "Y": $('input[name="inputGoToY"]').val(),
             "T": $('input[name="inputGoToT"]').val()
         };
 
@@ -539,7 +552,7 @@ function initEvents() {
     $.contextMenu({
         selector: '#positionChart',
         items: {
-            "goTo": {name: "Move To Here", callback: function (key, option) {
+            "goTo": {name: "Move Here", callback: function (key, option) {
                 $('#buttonGoTo').click();
             }},
             "sep3": "--------------",
@@ -559,15 +572,22 @@ function initEvents() {
 }
 
 function validateButtonGoTo() {
+    validateInput();
     var input = $('input[name="inputGoToT"]');
     if (isNaN(input.val()) || input.val() <= 0) {
         return false;
     }
-    return true;
-}
 
-function updateGoTo() {
-    $('#buttonGoTo').text('Go To: ' + goToX + ', ' + goToY);
+    input = $('input[name="inputGoToX"]');
+    if (isNaN(input.val())) {
+        return false;
+    }
+
+    input = $('input[name="inputGoToY"]');
+    if (isNaN(input.val())) {
+        return false;
+    }
+    return true;
 }
 
 function has(array, value) {
@@ -595,18 +615,18 @@ function addPoint(x, y, t) {
 function initFields() {
 
     var chart = $('#my_chart');
-    chart.css('height', (Number(chart.css('width').split('p')[0]) / 1.33).toFixed() + 'px');
+    chart.css('height', chart.css('width'));
     chart = $('#positionChart');
-    chart.css('height', (Number(chart.css('width').split('p')[0]) / 1.33).toFixed() + 'px');
+    chart.css('height', chart.css('width'));
 
     $('input[name="inputK"]').val(1)
     $('input[name="inputT"]').val(5);
     $('input[name="inputX"]').val(0);
     $('input[name="inputY"]').val(0);
     $('input[name="inputTorZ"]').val(5);
-
+    $('input[name="inputGoToX"]').val(0);
+    $('input[name="inputGoToY"]').val(0);
     $('input[name="inputGoToT"]').val(5);
-    updateGoTo();
 
     var selectMethod = $('#selectMethod');
     selectMethod.children().remove();
@@ -649,16 +669,17 @@ function refreshSelect() {
 
     selectPoints.attr('size', selectPoints[0].options.length);
 }
+//TODO: Add units in axes and change legend
+//TODO: Add tooltips or help
+//TODO: Accordion, Tabs or Hide/Show for sections
+//TODO: Resize charts on event
+//TODO: Implement real time update position with web sockets
+//TODO: Fix matlab file feature
+
+//TODO: Add simple commands for movements
+//TODO: Add getting image
+
 //TODO: Add context menu icons
 //TODO: Enable/Disable options in context menu
 //TODO: Hide multi select scroll bar
 //TODO: Look for validation plugin or library
-//TODO: Add mini log about request
-//TODO: Add simple commands for movements
-//TODO: Add getting image
-//TODO: Add units in axes and change legend
-//TODO: Add tooltips or help
-//TODO: accordion or hide/show for sections
-//TODO: improve ui components placement
-//TODO: resize charts on event
-//TODO: Implement real time update position with web sockets
