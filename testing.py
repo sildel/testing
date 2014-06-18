@@ -167,6 +167,6 @@ def logout():
 if __name__ == '__main__':
     HOST = '10.0.0.15'
     PORT = 50007
-    s.connect((HOST, PORT))
-    thread.start_new_thread(read_thread, ())
+    #s.connect((HOST, PORT))
+    #thread.start_new_thread(read_thread, ())
     app.run(host='0.0.0.0')

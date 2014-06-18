@@ -412,9 +412,23 @@ function initEvents() {
     $('#my_chart').bind('plothover', function (event, pos, item) {
         $('input[name="inputX"]').val(pos.x.toFixed(2));
         $('input[name="inputY"]').val(pos.y.toFixed(2));
+        if (item) {
+
+            var select = $('#selectPoints')[0];
+
+            for (var i = 0; i < select.length; i++) {
+                if (i == item.dataIndex) {
+                    select[i].selected = true;
+                }
+                else {
+                    select[i].selected = false;
+                }
+            }
+
+        }
     });
 
-    $('#positionChart').bind('plotclick', function (event, pos, item) {
+    $('#positionChart').bind('plothover', function (event, pos, item) {
         goToX = pos.x.toFixed(2);
         goToY = pos.y.toFixed(2);
         updateGoTo();
@@ -482,6 +496,65 @@ function initEvents() {
         });
     });
 
+    $.contextMenu({
+        selector: '#selectPoints',
+        items: {
+            "remove": {name: "Remove", callback: function (key, option) {
+                $('#buttonRemove').click();
+            }},
+            "selectAll": {name: "Select All", callback: function (key, option) {
+                $('#selectPoints').children().each(function () {
+                    this.selected = true;
+                });
+            }}
+        }
+    });
+
+    $.contextMenu({
+        selector: '#my_chart',
+        items: {
+            "play": {name: "Execute", callback: function (key, option) {
+                $('#buttonPlay').click();
+            }},
+            "stop": {name: "Stop", icon: "paste", callback: function (key, option) {
+                $('#buttonStop').click();
+            }},
+            "sep1": "--------------",
+            "addPoint": {name: "Add Point Here", callback: function (key, option) {
+                $('#buttonAdd').click();
+            }},
+            "removePoint": {name: "Remove Point", callback: function (key, option) {
+                $('#buttonRemove').click();
+            }},
+            "sep2": "--------------",
+            "restore": {name: "Restore", callback: function (key, option) {
+                $('#buttonRestore').click();
+            }},
+            "clear": {name: "Clear", callback: function (key, option) {
+                $('#buttonClear').click();
+            }}
+        }
+    });
+
+    $.contextMenu({
+        selector: '#positionChart',
+        items: {
+            "goTo": {name: "Move To Here", callback: function (key, option) {
+                $('#buttonGoTo').click();
+            }},
+            "sep3": "--------------",
+            "restore": {name: "Restore", callback: function (key, option) {
+                $('#buttonPositionRestore').click();
+            }},
+            "reset": {name: "Reset", callback: function (key, option) {
+                $('#buttonPositionReset').click();
+            }},
+            "refresh": {name: "Refresh", callback: function (key, option) {
+                $('#buttonPosition').click();
+            }}
+        }
+    });
+
     setTimeout(updatePosition, 250);
 }
 
@@ -522,9 +595,9 @@ function addPoint(x, y, t) {
 function initFields() {
 
     var chart = $('#my_chart');
-    chart.css('height', (Number(chart.css('width').split('p')[0]) / 1.8).toFixed() + 'px');
+    chart.css('height', (Number(chart.css('width').split('p')[0]) / 1.33).toFixed() + 'px');
     chart = $('#positionChart');
-    chart.css('height', (Number(chart.css('width').split('p')[0]) / 1.8).toFixed() + 'px');
+    chart.css('height', (Number(chart.css('width').split('p')[0]) / 1.33).toFixed() + 'px');
 
     $('input[name="inputK"]').val(1)
     $('input[name="inputT"]').val(5);
@@ -573,10 +646,19 @@ function refreshSelect() {
     for (var i = 0; i < points.length; i++) {
         selectPoints.append(new Option(points[i].toString() + ',' + zOrT[i].toString(), i));
     }
+
+    selectPoints.attr('size', selectPoints[0].options.length);
 }
-//TODO: context menu in chart and multi select
+//TODO: Add context menu icons
+//TODO: Enable/Disable options in context menu
+//TODO: Hide multi select scroll bar
 //TODO: Look for validation plugin or library
 //TODO: Add mini log about request
 //TODO: Add simple commands for movements
 //TODO: Add getting image
 //TODO: Add units in axes and change legend
+//TODO: Add tooltips or help
+//TODO: accordion or hide/show for sections
+//TODO: improve ui components placement
+//TODO: resize charts on event
+//TODO: Implement real time update position with web sockets
