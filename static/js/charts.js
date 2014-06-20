@@ -669,17 +669,16 @@ function refreshSelect() {
 
     selectPoints.attr('size', selectPoints[0].options.length);
 }
-//TODO: Add units in axes and change legend
-//TODO: Add tooltips or help
-//TODO: Accordion, Tabs or Hide/Show for sections
-//TODO: Resize charts on event
 //TODO: Implement real time update position with web sockets
 //TODO: Fix matlab file feature
-
 //TODO: Add simple commands for movements
 //TODO: Add getting image
 
 //TODO: Add context menu icons
+//TODO: Add tooltips or help
+//TODO: Add units in axes and change legend
 //TODO: Enable/Disable options in context menu
 //TODO: Hide multi select scroll bar
 //TODO: Look for validation plugin or library
+//TODO: Accordion, Tabs or Hide/Show for sections
+//TODO: Resize charts on event

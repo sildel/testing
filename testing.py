@@ -41,7 +41,7 @@ def execute():
 
     data = request.json
 
-    file_name_args = 'file.m'
+    file_name_args = '/home/pi/file.m'
 
     points_args = ''
 
@@ -56,7 +56,7 @@ def execute():
     program = ''
 
     if data['planning'] == 'Cubic':
-        program = 'path ' + str(data['T']) + ' ' + str(data['k']) + ' ' + common_args
+        program = 'path ' + str(data['T']) + ',' + str(data['k']) + ',' + common_args
     elif data['planning'] == 'Lineal Smooth':
         program = 'reference ' + common_args
     else:
