@@ -7,6 +7,8 @@ var points = [
     [1.5, 0.5]
 ];
 
+var ws;
+
 var cubicPoints = [];
 
 var zOrT = [0, 5, 5, 5, 5, 5];
@@ -321,6 +323,26 @@ function initialize() {
     initFields();
     drawPoints();
     initEvents();
+
+    if ("WebSocket" in window) {
+        ws = new WebSocket("ws://" + document.domain + ":5000/websocket");
+        ws.onmessage = function (msg) {
+            var message = JSON.parse(msg.data);
+            alert(message.output);
+        };
+    }
+
+    // Bind send button to websocket
+    $("#buttonSend").click(function () {
+        ws.send(JSON.stringify({'output': 'Testing'}));
+    });
+
+    // Cleanly close websocket when unload window
+    window.onbeforeunload = function () {
+        ws.onclose = function () {
+        }; // disable onclose handler first
+        ws.close()
+    };
 }
 
 function initEvents() {

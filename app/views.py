@@ -1,37 +1,7 @@
-from flask import Flask, jsonify, render_template, request, session, redirect, url_for, flash
-import socket
-import thread
+from flask import render_template, jsonify, request, session, redirect, url_for, flash
 
-s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-globalPositionX = 0
-globalPositionY = 0
-globalPositionZ = 0
-position_flag = False
-
-
-def read_thread():
-    global globalPositionX, globalPositionY, globalPositionZ, position_flag
-    while 1:
-        server_data = s.recv(1024)
-        command, data = server_data.split(' ')
-        if command == 'position':
-            coordinates = data.split(',')
-            globalPositionX = float(coordinates[0])
-            globalPositionY = float(coordinates[1])
-            globalPositionZ = float(coordinates[2])
-            position_flag = True
-
-        print 'Received:', repr(data)
-
-
-DEBUG = False
-SECRET_KEY = '\x1fx\x9e\xa7\x81Q\xb1\xcdZU~\x14\x0by\xff\xbeW\xf4 \xd0\xcc~\xd6\xc4'
-USERNAME = 'silvio'
-PASSWORD = 'silvio.1989'
-
-app = Flask(__name__)
-app.config.from_object(__name__)
-app.config.from_envvar('FLASKR_SETTINGS', silent=True)
+from app import app
+import motionserver
 
 
 @app.route('/execute', methods=['POST'])
@@ -62,7 +32,7 @@ def execute():
     else:
         program = 'points ' + common_args
 
-    s.sendall(program)
+    motionserver.s.sendall(program)
 
     return jsonify(program=program)
 
@@ -76,7 +46,7 @@ def move():
 
     program = 'position ' + str(data['X']) + ',' + str(data['Y']) + ',' + str(data['T'])
 
-    s.sendall(program)
+    motionserver.s.sendall(program)
 
     return jsonify(program=program)
 
@@ -87,7 +57,7 @@ def reset():
         return redirect(url_for('login'))
     program = 'position reset'
 
-    s.sendall(program)
+    motionserver.s.sendall(program)
 
     return jsonify(program=program)
 
@@ -98,34 +68,32 @@ def stop():
         return redirect(url_for('login'))
     program = 'experiment stop'
 
-    s.sendall(program)
+    motionserver.s.sendall(program)
 
     return jsonify(program=program)
 
 
 @app.route('/position', methods=['GET'])
 def get_position():
-    global position_flag
-
     program = ''
 
     if not session.get('logged_in'):
         return redirect(url_for('login'))
 
-    if not position_flag:
+    if not motionserver.position_flag:
         program = 'position ask'
-        s.sendall(program)
+        motionserver.s.sendall(program)
 
-        while not position_flag:
+        while not motionserver.position_flag:
             pass
 
-        position_flag = False
+        motionserver.position_flag = False
 
     position = dict()
 
-    position['x'] = globalPositionX
-    position['y'] = globalPositionY
-    position['z'] = globalPositionZ
+    position['x'] = motionserver.globalPositionX
+    position['y'] = motionserver.globalPositionY
+    position['z'] = motionserver.globalPositionZ
 
     return jsonify(program=program, position=position)
 
@@ -141,9 +109,9 @@ def index():
 def login():
     error = None
     if request.method == 'POST':
-        if request.form['username'] != app.config['USERNAME']:
+        if request.form['username'] != app.username:
             error = 'Invalid username'
-        elif request.form['password'] != app.config['PASSWORD']:
+        elif request.form['password'] != app.password:
             error = 'Invalid password'
         else:
             session['logged_in'] = True
@@ -157,11 +125,3 @@ def logout():
     session.pop('logged_in', None)
     flash('You were logged out')
     return redirect(url_for('login'))
-
-
-if __name__ == '__main__':
-    HOST = '10.0.0.15'
-    PORT = 50007
-    s.connect((HOST, PORT))
-    thread.start_new_thread(read_thread, ())
-    app.run(host='0.0.0.0')
