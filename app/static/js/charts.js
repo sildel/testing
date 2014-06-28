@@ -84,22 +84,6 @@ function callPositionPlot() {
     });
 }
 
-function updatePosition() {
-    $.getJSON('/position', function (data) {
-        if (positionPointsXY.length == 0 || data.position.x != positionPointsXY[positionPointsXY.length - 1][0] &&
-            data.position.y != positionPointsXY[positionPointsXY.length - 1][1] &&
-            data.position.z != positionPointsZ[positionPointsZ.length - 1]) {
-
-            positionPointsXY.push([data.position.x, data.position.y]);
-            positionPointsZ.push(data.position.z);
-
-            callPositionPlot();
-        }
-    });
-
-    setTimeout(updatePosition, 250);
-}
-
 function validateInput() {
     var input = $('input[name="inputGoToT"]');
     if (isNaN(input.val()) || input.val() <= 0) {
@@ -328,14 +312,13 @@ function initialize() {
         ws = new WebSocket("ws://" + document.domain + ":5000/websocket");
         ws.onmessage = function (msg) {
             var message = JSON.parse(msg.data);
-            alert(message.output);
+
+            positionPointsXY.push([message.position[0], message.position[1]]);
+            positionPointsZ.push(message.position[2]);
+
+            callPositionPlot();
         };
     }
-
-    // Bind send button to websocket
-    $("#buttonSend").click(function () {
-        ws.send(JSON.stringify({'output': 'Testing'}));
-    });
 
     // Cleanly close websocket when unload window
     window.onbeforeunload = function () {
@@ -343,6 +326,10 @@ function initialize() {
         }; // disable onclose handler first
         ws.close()
     };
+
+    setTimeout(function () {
+        $.getJSON('/position');
+    }, 250);
 }
 
 function initEvents() {
@@ -393,17 +380,13 @@ function initEvents() {
             dataType: "json",
             success: function (data) {
 //                $('#file').val(data.string);
-                alert('command: ' + data.program);
+//                alert('command: ' + data.program);
             }
         });
     });
 
     $('#buttonPosition').click(function () {
-        $.getJSON('/position', function (data) {
-            positionPointsXY.push([data.position.x, data.position.y]);
-            positionPointsZ.push(data.position.z);
-            callPositionPlot();
-        });
+        $.getJSON('/position');
     });
 
     $('#buttonRemove').click(function () {
@@ -486,7 +469,8 @@ function initEvents() {
                 positionPointsXY = []
                 positionPointsZ = []
 
-                alert('command: ' + data.program);
+//                alert('command: ' + data.program);
+                $('#buttonPosition').click();
             }
         });
     });
@@ -512,7 +496,7 @@ function initEvents() {
             dataType: "json",
             success: function (data) {
 //                $('#file').val(data.string);
-                alert('command: ' + data.program);
+//                alert('command: ' + data.program);
             }
         });
     });
@@ -526,7 +510,7 @@ function initEvents() {
             data: "",
             dataType: "json",
             success: function (data) {
-                alert('command: ' + data.program);
+//                alert('command: ' + data.program);
             }
         });
     });
@@ -589,8 +573,6 @@ function initEvents() {
             }}
         }
     });
-
-    setTimeout(updatePosition, 250);
 }
 
 function validateButtonGoTo() {
@@ -691,7 +673,6 @@ function refreshSelect() {
 
     selectPoints.attr('size', selectPoints[0].options.length);
 }
-//TODO: Implement real time update position with web sockets
 //TODO: Fix matlab file feature
 //TODO: Add simple commands for movements
 //TODO: Add getting image

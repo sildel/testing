@@ -75,27 +75,12 @@ def stop():
 
 @app.route('/position', methods=['GET'])
 def get_position():
-    program = ''
-
     if not session.get('logged_in'):
         return redirect(url_for('login'))
 
-    if not motionserver.position_flag:
-        program = 'position ask'
-        motionserver.s.sendall(program)
+    motionserver.s.sendall('position ask')
 
-        while not motionserver.position_flag:
-            pass
-
-        motionserver.position_flag = False
-
-    position = dict()
-
-    position['x'] = motionserver.globalPositionX
-    position['y'] = motionserver.globalPositionY
-    position['z'] = motionserver.globalPositionZ
-
-    return jsonify(program=program, position=position)
+    return jsonify(program='position ask')
 
 
 @app.route('/')

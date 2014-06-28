@@ -1,14 +1,17 @@
 import json
+import motionserver
 
 
 def handle_websocket(ws):
+    print 'Start ws'
+    motionserver.client_ws = ws
     while True:
         message = ws.receive()
         if message is None:
             break
         else:
             message = json.loads(message)
+            ws.send(json.dumps({'output': message['output']}))
 
-            r = "I have received this message from you : %s" % message
-            r += "<br>Glad to be your webserver."
-            ws.send(json.dumps({'output': r}))
+    motionserver.client_ws = None
+    print 'End ws'
