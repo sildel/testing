@@ -29,5 +29,5 @@ def read_thread():
 
 
 
-        print 'Received:', repr(server_data)
+        # print 'Received:', repr(server_data)
 
