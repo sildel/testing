@@ -528,7 +528,7 @@ function initEvents() {
 
         sending_data_post = {
             "direction": "forward",
-            "speed": 5
+            "speed": 0.5
         };
 
         $.ajax({
@@ -542,7 +542,7 @@ function initEvents() {
 //                $('#file').val(data.string);
 //                alert('command: ' + data.program);
                 sending = true;
-                setTimeout(keepSending, 1000);
+                setTimeout(keepSending, 500);
             }
         });
     });
@@ -588,7 +588,7 @@ function initEvents() {
 //                $('#file').val(data.string);
 //                alert('command: ' + data.program);
                 sending = true;
-                setTimeout(keepSending, 1000);
+                setTimeout(keepSending, 500);
             }
         });
     });
@@ -634,7 +634,7 @@ function initEvents() {
 //                $('#file').val(data.string);
 //                alert('command: ' + data.program);
                 sending = true;
-                setTimeout(keepSending, 1000);
+                setTimeout(keepSending, 500);
             }
         });
     });
@@ -680,7 +680,7 @@ function initEvents() {
 //                $('#file').val(data.string);
 //                alert('command: ' + data.program);
                 sending = true;
-                setTimeout(keepSending, 1000);
+                setTimeout(keepSending, 500);
             }
         });
     });
@@ -783,7 +783,7 @@ function keepSending() {
 //                alert('command: ' + data.program);
             }
         });
-        setTimeout(keepSending, 1000);
+        setTimeout(keepSending, 500);
     }
 }
 

@@ -60,9 +60,9 @@ def start():
 
     program = 'movement ' + str(data['direction']) + ',' + str(data['speed'])
 
-    # motionserver.s.sendall(program)
+    motionserver.s.sendall(program)
 
-    print program
+    # print program
 
     return jsonify(program=program)
 

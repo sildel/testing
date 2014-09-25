@@ -29,7 +29,11 @@ def read_thread():
             f = open("/home/pi/file.m")
             to_send = f.read()
             f.close()
-            client_ws.send(json.dumps({'file_content': to_send}))
+            if client_ws is not None:
+                try:
+                    client_ws.send(json.dumps({'file_content': to_send}))
+                except Exception:
+                    print Exception.message
 
-        #  print 'Received:', repr(server_data)
+                    #  print 'Received:', repr(server_data)
 
