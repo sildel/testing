@@ -9,6 +9,9 @@ var points = [
 
 var ws;
 
+var sending = false;
+var sending_data_post;
+
 var cubicPoints = [];
 
 var zOrT = [0, 5, 5, 5, 5, 5];
@@ -313,10 +316,16 @@ function initialize() {
         ws.onmessage = function (msg) {
             var message = JSON.parse(msg.data);
 
-            positionPointsXY.push([message.position[0], message.position[1]]);
-            positionPointsZ.push(message.position[2]);
+            if (message.hasOwnProperty("position")) {
 
-            callPositionPlot();
+                positionPointsXY.push([message.position[0], message.position[1]]);
+                positionPointsZ.push(message.position[2]);
+
+                callPositionPlot();
+            }
+            else if (message.hasOwnProperty("file_content")) {
+                $("#textAreaFileM").text(message.file_content);
+            }
         };
     }
 
@@ -515,6 +524,190 @@ function initEvents() {
         });
     });
 
+    $('#buttonForward').mousedown(function () {
+
+        sending_data_post = {
+            "direction": "forward",
+            "speed": 5
+        };
+
+        $.ajax({
+            url: "/start",
+            type: "POST",
+            contentType: "application/json",
+            processData: false,
+            data: JSON.stringify(sending_data_post),
+            dataType: "json",
+            success: function (data) {
+//                $('#file').val(data.string);
+//                alert('command: ' + data.program);
+                sending = true;
+                setTimeout(keepSending, 1000);
+            }
+        });
+    });
+
+    $('#buttonForward').mouseup(function () {
+
+        sending = false;
+
+        sending_data_post = {
+            "direction": "forward",
+            "speed": 0
+        };
+
+        $.ajax({
+            url: "/start",
+            type: "POST",
+            contentType: "application/json",
+            processData: false,
+            data: JSON.stringify(sending_data_post),
+            dataType: "json",
+            success: function (data) {
+//                $('#file').val(data.string);
+//                alert('command: ' + data.program);
+            }
+        });
+    });
+
+    $('#buttonBackward').mousedown(function () {
+
+        sending_data_post = {
+            "direction": "backward",
+            "speed": 5
+        };
+
+        $.ajax({
+            url: "/start",
+            type: "POST",
+            contentType: "application/json",
+            processData: false,
+            data: JSON.stringify(sending_data_post),
+            dataType: "json",
+            success: function (data) {
+//                $('#file').val(data.string);
+//                alert('command: ' + data.program);
+                sending = true;
+                setTimeout(keepSending, 1000);
+            }
+        });
+    });
+
+    $('#buttonBackward').mouseup(function () {
+
+        sending = false;
+
+        sending_data_post = {
+            "direction": "backward",
+            "speed": 0
+        };
+
+        $.ajax({
+            url: "/start",
+            type: "POST",
+            contentType: "application/json",
+            processData: false,
+            data: JSON.stringify(sending_data_post),
+            dataType: "json",
+            success: function (data) {
+//                $('#file').val(data.string);
+//                alert('command: ' + data.program);
+            }
+        });
+    });
+
+    $('#buttonRight').mousedown(function () {
+
+        sending_data_post = {
+            "direction": "right",
+            "speed": 5
+        };
+
+        $.ajax({
+            url: "/start",
+            type: "POST",
+            contentType: "application/json",
+            processData: false,
+            data: JSON.stringify(sending_data_post),
+            dataType: "json",
+            success: function (data) {
+//                $('#file').val(data.string);
+//                alert('command: ' + data.program);
+                sending = true;
+                setTimeout(keepSending, 1000);
+            }
+        });
+    });
+
+    $('#buttonRight').mouseup(function () {
+
+        sending = false;
+
+        sending_data_post = {
+            "direction": "right",
+            "speed": 0
+        };
+
+        $.ajax({
+            url: "/start",
+            type: "POST",
+            contentType: "application/json",
+            processData: false,
+            data: JSON.stringify(sending_data_post),
+            dataType: "json",
+            success: function (data) {
+//                $('#file').val(data.string);
+//                alert('command: ' + data.program);
+            }
+        });
+    });
+
+    $('#buttonLeft').mousedown(function () {
+
+        sending_data_post = {
+            "direction": "left",
+            "speed": 5
+        };
+
+        $.ajax({
+            url: "/start",
+            type: "POST",
+            contentType: "application/json",
+            processData: false,
+            data: JSON.stringify(sending_data_post),
+            dataType: "json",
+            success: function (data) {
+//                $('#file').val(data.string);
+//                alert('command: ' + data.program);
+                sending = true;
+                setTimeout(keepSending, 1000);
+            }
+        });
+    });
+
+    $('#buttonLeft').mouseup(function () {
+
+        sending = false;
+
+        sending_data_post = {
+            "direction": "left",
+            "speed": 0
+        };
+
+        $.ajax({
+            url: "/start",
+            type: "POST",
+            contentType: "application/json",
+            processData: false,
+            data: JSON.stringify(sending_data_post),
+            dataType: "json",
+            success: function (data) {
+//                $('#file').val(data.string);
+//                alert('command: ' + data.program);
+            }
+        });
+    });
+
     $.contextMenu({
         selector: '#selectPoints',
         items: {
@@ -573,6 +766,25 @@ function initEvents() {
             }}
         }
     });
+}
+
+function keepSending() {
+    if (sending) {
+
+        $.ajax({
+            url: "/start",
+            type: "POST",
+            contentType: "application/json",
+            processData: false,
+            data: JSON.stringify(sending_data_post),
+            dataType: "json",
+            success: function (data) {
+//                $('#file').val(data.string);
+//                alert('command: ' + data.program);
+            }
+        });
+        setTimeout(keepSending, 1000);
+    }
 }
 
 function validateButtonGoTo() {
@@ -673,7 +885,6 @@ function refreshSelect() {
 
     selectPoints.attr('size', selectPoints[0].options.length);
 }
-//TODO: Fix matlab file feature
 //TODO: Add simple commands for movements
 //TODO: Add getting image
 

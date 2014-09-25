@@ -25,9 +25,11 @@ def read_thread():
                     client_ws.send(json.dumps({'position': [globalPositionX, globalPositionY, globalPositionZ]}))
                 except Exception:
                     print Exception.message
+        elif command == "experiment" and data == 'done':
+            f = open("/home/pi/file.m")
+            to_send = f.read()
+            f.close()
+            client_ws.send(json.dumps({'file_content': to_send}))
 
-
-
-
-        # print 'Received:', repr(server_data)
+        #  print 'Received:', repr(server_data)
 

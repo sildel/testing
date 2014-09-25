@@ -51,6 +51,22 @@ def move():
     return jsonify(program=program)
 
 
+@app.route('/start', methods=['POST'])
+def start():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+
+    data = request.json
+
+    program = 'movement ' + str(data['direction']) + ',' + str(data['speed'])
+
+    # motionserver.s.sendall(program)
+
+    print program
+
+    return jsonify(program=program)
+
+
 @app.route('/reset', methods=['POST'])
 def reset():
     if not session.get('logged_in'):
