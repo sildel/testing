@@ -1,4 +1,4 @@
-from flask import render_template, jsonify, request, session, redirect, url_for, flash
+from flask import render_template, jsonify, request, session, redirect, url_for, flash, send_from_directory
 
 from app import app
 import motionserver
@@ -94,7 +94,7 @@ def get_position():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
 
-    motionserver.s.sendall('position ask')
+    #motionserver.s.sendall('position ask')
 
     return jsonify(program='position ask')
 
@@ -104,6 +104,12 @@ def index():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     return render_template('index.html')
+
+
+@app.route('/image_test')
+def image_test():
+    #save_file = open('D:\\rpi.jpg', 'rb')
+    return send_from_directory('/dev/shm/mjpeg', 'cam.jpg')
 
 
 @app.route('/login', methods=['GET', 'POST'])

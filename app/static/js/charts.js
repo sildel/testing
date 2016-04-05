@@ -339,6 +339,19 @@ function initialize() {
     setTimeout(function () {
         $.getJSON('/position');
     }, 250);
+
+    $("#preview_image").load(function () {
+        $("#preview_image").attr('src', '/image_test?time=' + new Date().getTime());
+    });
+
+    $("#preview_image").error(function () {
+        setTimeout(function () {
+            $("#preview_image").attr('src', '/image_test?time=' + new Date().getTime());
+        }, 100);
+    });
+
+    $("#preview_image").load();
+
 }
 
 function initEvents() {
