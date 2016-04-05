@@ -574,7 +574,7 @@ function initEvents() {
 
         sending_data_post = {
             "direction": "backward",
-            "speed": 5
+            "speed": 0.5
         };
 
         $.ajax({
@@ -620,7 +620,7 @@ function initEvents() {
 
         sending_data_post = {
             "direction": "right",
-            "speed": 5
+            "speed": 1.25
         };
 
         $.ajax({
